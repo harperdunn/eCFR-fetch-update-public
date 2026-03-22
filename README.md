@@ -8,11 +8,6 @@ Scripts for discovering, enriching, and monitoring CAFO-relevant federal regulat
 
 These scripts maintain a CSV database of CFR documents relevant to CAFOs (Concentrated Animal Feeding Operations).
 
-**One-time setup:**
-```
-enrich.py
-```
-
 **Ongoing workflow (run weekly):**
 ```
 discover.py  →  monitor.py
@@ -20,9 +15,9 @@ discover.py  →  monitor.py
 
 | Script | Purpose |
 |---|---|
-| `enrich.py` | One-time setup: fills in `latest_amendment_date` and `version_flag` for the initial database by calling the eCFR versions API |
 | `discover.py` | Searches the eCFR API for new CAFO-relevant regulations and appends them to the database |
 | `monitor.py` | Checks existing database rows against the current eCFR API and flags any that have been amended |
+| `enrich.py` | One-time setup script used for the initial batch — fills in `latest_amendment_date` for existing rows |
 
 ---
 
@@ -53,26 +48,6 @@ python3 discover.py
 ```
 
 **Output:** Appends new rows to `batch_1_included_ultimate_broad_update.csv`. Updates `discover_last_run.txt` with today's date for the next incremental run.
-
----
-
-### `enrich.py` _(one-time setup)_
-
-Enriches existing database rows with amendment dates from the eCFR versions API.
-
-- Fills `latest_amendment_date` with the most recent substantive change date for each section or part
-- Sets `version_flag` to `Check` for any document amended after `VERSION_CHECK_AFTER`
-- Ignores non-substantive edits (typo fixes, renumbering)
-- Section-level URLs get that section's own amendment history; part-level URLs use the part's latest date
-
-```bash
-cd eCFR
-python3 enrich.py
-```
-
-**Output:** Overwrites the input CSV in place with updated columns.
-
-> Note: This script was primarily useful for the initial batch. For ongoing monitoring, use `monitor.py`.
 
 ---
 
